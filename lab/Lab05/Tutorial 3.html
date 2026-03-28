@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Tutorial 3</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <style>
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+    // ✅ London map
+    var map = L.map('map').setView([51.505, -0.09], 13);
+
+    // Tile layer
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    // ✅ Icon class with shadow
+    var LeafIcon = L.Icon.extend({
+        options: {
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize:     [38, 95],
+            shadowSize:   [50, 64],
+            iconAnchor:   [22, 94],
+            shadowAnchor: [4, 62],
+            popupAnchor:  [-3, -76]
+        }
+    });
+
+    // ✅ Create ONE icon
+    var greenIcon = new LeafIcon({
+        iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png'
+    });
+
+    // ✅ Add ONE marker
+    L.marker([51.505, -0.09], {icon: greenIcon})
+        .addTo(map)
+        .bindPopup("<b>London</b><br>Custom leaf icon")
+        .openPopup();
+
+</script>
+
+</body>
+</html>
