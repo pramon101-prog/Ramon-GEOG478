@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pedro Ramon</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+    #map {
+      height: 600px;
+      width: 900px;
+    }
+
+    .info {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 5px;
+    }
+
+    .info h4 {
+      margin: 0 0 5px;
+      color: #800000;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Pedro Ramon</h2>
+<div id="map"></div>
+
+<!-- GeoJSON file -->
+<script src="tamubuildings.js"></script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+  
+  var map = L.map('map').setView([30.6188, -96.3365], 15);
+
+  
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  
+  var info = L.control();
+
+  info.onAdd = function () {
+    this._div = L.DomUtil.create('div', 'info');
+    this.update();
+    return this._div;
+  };
+
+  info.update = function (props) {
+    this._div.innerHTML = '<h4>TAMU Building Info</h4>' + (props ?
+      '<b>' + props.BldgName + '</b><br/>Abbr: ' + props.BldgAbbr
+      : 'Hover over a building');
+  };
+
+  info.addTo(map);
+
+  //  Style 
+  function style(feature) {
+    return {
+      weight: 2,
+      color: '#800000',       //  outline
+      fillColor: '#800000',   //  fill
+      fillOpacity: 0.6
+    };
+  }
+
+  
+  function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+      weight: 4,
+      color: '#000',
+      fillOpacity: 0.9
+    });
+
+    layer.bringToFront();
+
+    info.update(layer.feature.properties);
+  }
+
+  
+  function resetHighlight(e) {
+    geojson.resetStyle(e.target);
+    info.update();
+  }
+
+  
+  function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+  }
+
+  
+  function onEachFeature(feature, layer) {
+    layer.on({
+      mouseover: highlightFeature,
+      mouseout: resetHighlight,
+      click: zoomToFeature
+    });
+  }
+
+  // GeoJSON layer 
+  var geojson = L.geoJSON(tamu, {
+    style: style,
+    onEachFeature: onEachFeature
+  }).addTo(map);
+
+</script>
+
+</body>
+</html>
