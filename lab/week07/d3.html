@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>D3 Line Chart temp data</title>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <style>
+    .line-high { fill:none; stroke:steelblue; stroke-width:2; }
+    .line-low { fill:none; stroke:orange; stroke-width:2; }
+    .dot-high { fill:steelblue; }
+    .dot-low { fill:orange; }
+    .tooltip { position:absolute; background:lightgray; padding:5px; border-radius:5px; font-size:12px; pointer-events:none; }
+  </style>
+</head>
+<body>
+  <h2>Weekly Temperature Forecast in College Station</h2>
+  <svg width="700" height="400"></svg>
+  <div class="tooltip" style="opacity:0;"></div>
+
+  <script>
+    // Data
+    var days = ["Sat","Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var high = [82,81,81,70,77,78,79,80];
+    var low  = [67,59,50,47,51,60,66,66];
+
+    var svg = d3.select("svg"),
+        margin = {top: 20, right: 50, bottom: 30, left: 40},
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+
+    var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var tooltip = d3.select(".tooltip");
+
+    
+    var x = d3.scaleLinear().domain([0, days.length-1]).range([0, width]);
+    var y = d3.scaleLinear().domain([40,90]).range([height,0]);
+
+   
+    var lineHigh = d3.line()
+      .x((d,i)=>x(i))
+      .y(d=>y(d));
+
+    var lineLow = d3.line()
+      .x((d,i)=>x(i))
+      .y(d=>y(d));
+
+    
+    var xAxis = d3.axisBottom(x)
+                  .ticks(days.length-1)
+                  .tickFormat((d,i)=>days[i]);
+    g.append("g").attr("transform","translate(0,"+height+")").call(xAxis);
+    g.append("g").call(d3.axisLeft(y));
+
+    
+    g.append("path").datum(high).attr("class","line-high").attr("d", lineHigh);
+    g.append("path").datum(low).attr("class","line-low").attr("d", lineLow);
+
+    
+    g.selectAll(".dot-high").data(high).enter().append("circle")
+      .attr("class","dot-high")
+      .attr("cx",(d,i)=>x(i))
+      .attr("cy",d=>y(d))
+      .attr("r",4)
+      .on("mouseover", (d,i)=>tooltip.style("opacity",1).html(days[i]+" High: "+d+"°F").style("left",(d3.event.pageX+5)+"px").style("top",(d3.event.pageY-28)+"px"))
+      .on("mouseout",()=>tooltip.style("opacity",0));
+
+    g.selectAll(".dot-low").data(low).enter().append("circle")
+      .attr("class","dot-low")
+      .attr("cx",(d,i)=>x(i))
+      .attr("cy",d=>y(d))
+      .attr("r",4)
+      .on("mouseover", (d,i)=>tooltip.style("opacity",1).html(days[i]+" Low: "+d+"°F").style("left",(d3.event.pageX+5)+"px").style("top",(d3.event.pageY-28)+"px"))
+      .on("mouseout",()=>tooltip.style("opacity",0));
+  </script>
+</body>
+</html>
